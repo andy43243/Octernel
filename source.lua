@@ -58,8 +58,12 @@ end
 --From: https://devforum.roblox.com/t/how-to-create-a-simple-rainbow-effect-using-tweenService/221849/2
 local chromaColor
 spawn(function()
-    while library and wait() do
-        chromaColor = Color3.fromHSV(tick() % 6 / 6, 1, 1)
+    while wait() do
+        if library then
+            chromaColor = Color3.fromHSV(tick() % 6 / 6, 1, 1)
+        else
+            break
+        end
     end
 end)
 
@@ -724,7 +728,9 @@ library.createSlider = function(option, parent)
         TextXAlignment = Enum.TextXAlignment[(option.sub or option.textpos) and "Center" or "Left"],
         Parent = (option.sub or option.textpos) and option.slider or option.main
     })
-    table.insert(library.theme, option.fill)
+    if option.fill then
+        table.insert(library.theme, option.fill)
+    end
 
     library:Create("UIGradient", {
         Color = ColorSequence.new({
@@ -927,7 +933,7 @@ library.createList = function(option, parent)
         Text = "",
         AutoButtonColor = false,
         Visible = false,
-        Parent = library.base
+        Parent = library.base or game:GetService("CoreGui")
     })
 
     option.content = library:Create("ScrollingFrame", {
