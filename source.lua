@@ -2472,6 +2472,16 @@ function library:Close()
     end
 end
 
+function library:Show()
+    self.open = true
+    if self.main then
+        self.main.Visible = true
+        if self.toggleButton then
+            self.toggleButton.Text = "✕"
+        end
+    end
+end
+
 function library:Init()
     if self.hasInit then return end
     self.hasInit = true
@@ -2479,8 +2489,12 @@ function library:Init()
     self.base = library:Create("ScreenGui", {IgnoreGuiInset = true, ZIndexBehavior = Enum.ZIndexBehavior.Global})
     if runService:IsStudio() then
         self.base.Parent = script.Parent.Parent
+    elseif gethui then
+        self.base.Parent = gethui()
     elseif syn then
         pcall(function() self.base.RobloxLocked = true end)
+        self.base.Parent = game:GetService"CoreGui"
+    else
         self.base.Parent = game:GetService"CoreGui"
     end
 
@@ -2769,7 +2783,11 @@ function library:Init()
     end)
 
     if not getgenv().silent then
-        delay(1, function() self:Close() end)
+        delay(1, function() 
+            if library then
+                self:Show() 
+            end
+        end)
     end
 end
 
