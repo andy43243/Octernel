@@ -2722,9 +2722,15 @@ function library:Init()
         tab.button.TextColor3 = library.flags["Menu Accent Color"]
         self.tabHighlight:TweenPosition(UDim2.new(0, tab.button.Position.X.Offset, 0, 50), "Out", "Quad", 0.2, true)
         self.tabHighlight:TweenSize(UDim2.new(0, tab.button.AbsoluteSize.X, 0, -1), "Out", "Quad", 0.1, true)
-        for _, column in next, tab.columns do
+        
+        -- Make columns visible
+        for i, column in next, tab.columns do
             if column.main then
                 column.main.Visible = true
+                -- Debug: print column info
+                print("Column", i, "visible:", column.main.Visible, "sections:", #column.sections)
+            else
+                print("Column", i, "has no main!")
             end
         end
     end
@@ -2732,15 +2738,17 @@ function library:Init()
     spawn(function()
         while library do
             wait(1)
-            local Configs = self:GetConfigs()
-            for _, config in next, Configs do
-                if not table.find(self.options["Config List"].values, config) then
-                    self.options["Config List"]:AddValue(config)
+            if library.options and library.options["Config List"] then
+                local Configs = self:GetConfigs()
+                for _, config in next, Configs do
+                    if not table.find(self.options["Config List"].values, config) then
+                        self.options["Config List"]:AddValue(config)
+                    end
                 end
-            end
-            for _, config in next, self.options["Config List"].values do
-                if not table.find(Configs, config) then
-                    self.options["Config List"]:RemoveValue(config)
+                for _, config in next, self.options["Config List"].values do
+                    if not table.find(Configs, config) then
+                        self.options["Config List"]:RemoveValue(config)
+                    end
                 end
             end
         end
