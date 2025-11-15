@@ -2701,14 +2701,15 @@ function library:Init()
         if self.currentTab then
             self.currentTab.button.TextColor3 = Color3.fromRGB(255, 255, 255)
             for _, column in next, self.currentTab.columns do
-                column.main.Visible = false
+                if column.main then
+                    column.main.Visible = false
+                end
             end
         end
         -- Adjust size based on device and number of columns
-        local baseWidth = self.isMobile and 350 or 490
         local columnWidth = self.isMobile and 190 or 239
         local height = self.isMobile and 500 or 600
-        local numColumns = #tab.columns < 2 and 2 or #tab.columns
+        local numColumns = #tab.columns > 0 and #tab.columns or 2
         self.main.Size = UDim2.new(0, 16 + (numColumns * columnWidth), 0, height)
         
         self.currentTab = tab
@@ -2716,7 +2717,9 @@ function library:Init()
         self.tabHighlight:TweenPosition(UDim2.new(0, tab.button.Position.X.Offset, 0, 50), "Out", "Quad", 0.2, true)
         self.tabHighlight:TweenSize(UDim2.new(0, tab.button.AbsoluteSize.X, 0, -1), "Out", "Quad", 0.1, true)
         for _, column in next, tab.columns do
-            column.main.Visible = true
+            if column.main then
+                column.main.Visible = true
+            end
         end
     end
 
@@ -2737,11 +2740,15 @@ function library:Init()
         end
     end)
 
-    for _, tab in next, self.tabs do
+    for i, tab in next, self.tabs do
         if tab.canInit then
             tab:Init()
-            self:selectTab(tab)
         end
+    end
+    
+    -- Select the first tab after all are initialized
+    if self.tabs[1] then
+        self:selectTab(self.tabs[1])
     end
 
     self:AddConnection(inputService.InputEnded, function(input)
